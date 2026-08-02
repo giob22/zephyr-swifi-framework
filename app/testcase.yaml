@@ -1,0 +1,64 @@
+tests:
+  swifi.msgq.msgsize.baseline:
+    platform_allow:
+      - mps2/an385
+    extra_configs:
+      - CONFIG_FI_ENABLE=n
+    timeout: 30
+    harness: console
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - 'ricevuto value=42'  
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'
+ 
+  swifi.msgq.msgsize.badarg4:
+    platform_allow:
+      - mps2/an385
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+    timeout: 30
+    harness: console
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - 'CORROTTA'  
+        - '\[RUN\] END' 
+      record:
+        regex:
+          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'
+
+
+  swifi.msgq.msgsize.badarg1:
+    platform_allow:
+      - mps2/an385
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x0
+      - CONFIG_FI_ENABLE=y
+    timeout: 30
+    harness: console
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'

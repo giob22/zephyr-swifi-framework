@@ -1,0 +1,17 @@
+mainmenu "SWIFI k_msgq"
+
+
+config FI_ENABLE
+    bool "Abilita l'iniezione del fault"
+    default y
+config FI_VALUE
+    hex "Valore corrotto scritto in msg_size"
+    default 0x40
+config FI_TRIGGER
+    int "Attivazione su cui iniettare (fault transitorio)"
+    default 1
+
+
+
+
+source "Kconfig.zephyr" 
