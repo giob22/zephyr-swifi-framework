@@ -7,7 +7,7 @@ interposizione a tempo di link (`-Wl,--wrap=z_impl_k_msgq_put`).
 
 | | |
 |---|---|
-| Zephyr | `v4.4.0-8541-gdf1fb529e38f` — commit `df1fb529e38f34fa45c1fe1cb6aace42802de3db` |
+| Zephyr | `v4.4.0-8541-gdf1fb529e38f` |
 | west | 1.5.0 |
 | Zephyr SDK | 1.0.1 |
 | Board | `mps2/an385` (QEMU, ARM Cortex-M3) |
@@ -31,6 +31,5 @@ west build -t run
 Gli scenari sono definiti in `app/testcase.yaml`. Per eseguirli:
 
 ```bash
-cd $ZEPHYR_BASE
 ./scripts/twister -p mps2/an385 -T esperimento-swifi-msgq/app -v --inline-logs
 ```
