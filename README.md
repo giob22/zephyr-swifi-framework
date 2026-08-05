@@ -15,7 +15,7 @@ interposizione a tempo di link (`-Wl,--wrap=z_impl_k_msgq_put`).
 ## Build ed esecuzione
 
 ```bash
-west build -p always -b mps2/an385 esperimento-swifi-msgq/app
+west build -p always -b mps2/an385 app
 west build -t run
 ```
 
@@ -31,5 +31,5 @@ west build -t run
 Gli scenari sono definiti in `app/testcase.yaml`. Per eseguirli:
 
 ```bash
-./scripts/twister -p mps2/an385 -T esperimento-swifi-msgq/app -v --inline-logs
+./scripts/twister -p mps2/an385 -T app -v --inline-logs
 ```
