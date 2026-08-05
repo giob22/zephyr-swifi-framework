@@ -12,10 +12,10 @@ interposizione a tempo di link (`-Wl,--wrap=z_impl_k_msgq_put`).
 | Zephyr SDK | 1.0.1 |
 | Board | `mps2/an385` (QEMU, ARM Cortex-M3) |
 
-## Build ed esecuzione di una singola configurazione
+## Build ed esecuzione
 
 ```bash
-west build -p always -b mps2/an385 <percorso>/esperimento-swifi-msgq/app
+west build -p always -b mps2/an385 esperimento-swifi-msgq/app
 west build -t run
 ```
 
