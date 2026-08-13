@@ -1,12 +1,14 @@
 #include "msgq_app.h"
 #include <zephyr/kernel.h>
 #include <string.h>
+#include "sem_app.h"
 
 #define MAX_MSGS 4
 #define CANARY_BYTES 64
 #define CANARY_PATTERN 0xAA
 
-void fi_report(void);
+void fi_msgq_report(void);
+void fi_sem_report(void);
 
 
 // test per verificare l'utilizzo appropriato di k_magq_put nel contesto di interrupt
@@ -52,12 +54,19 @@ void my_expire_fn(struct k_timer *timer);
 // inserisco il ring buffer della coda di messaggi e la sentinella (il buffer canary) all'interno di una struct in modo che in memoria siano
 // disposti in modo contiguo, quindi un overflow su ring_buffer intacca il contenuto del buffer canary.
 
+// CODE DI MESSAGGI
+
+
+
+
+struct k_msgq my_msgq;
+
+#ifdef CONFIG_WL_MSGQ
+
 static struct{
     char ring_buffer[MAX_MSGS * sizeof(data_type)];
     uint8_t canary[CANARY_BYTES];
 }area __aligned(__alignof__(data_type));
-
-struct k_msgq my_msgq;
 
 static void canary_fill(void){
     memset( area.canary, CANARY_PATTERN, CANARY_BYTES );
@@ -93,7 +102,7 @@ static void canary_check(const char *quando){
     }
 
     if ( corrotti == 0 ){
-        printk("[CANARY %s] intatta: nessuna scrittura oltre il buffer\n", quando);
+        printk("[CANARY %s] INTATTA: nessuna scrittura oltre il buffer\n", quando);
     }else{
         printk("[CANARY %s] CORROTTA: %u byte su %d, a partire dall'offset %d a %d\n",
                                         quando, corrotti, CANARY_BYTES, primo, ultimo);
@@ -101,10 +110,20 @@ static void canary_check(const char *quando){
 }
 
 
+#endif
+
+
+// SEMAFORI
+
+
+
+K_SEM_DEFINE(my_sem, 1, 1); // conteggio 1, limite 1 → mutex
+
+
 
 
 int main(void){
-    
+    #ifdef CONFIG_WL_MSGQ
     // inizializzazione della coda a run-time
     k_msgq_init(&my_msgq, area.ring_buffer, sizeof(data_type), MAX_MSGS);
 
@@ -206,7 +225,7 @@ int main(void){
     // ----------------------------------------------
     // REPORT
 
-    fi_report();
+    fi_msgq_report();
 
     // ----------------------------------------------
     // 
@@ -219,7 +238,27 @@ int main(void){
     // senza twister non riesce a discriminare un workload completato da uno morto a metà.
 
 
-    printk("[RUN] END\n");
 
+    #endif
+
+    #ifdef CONFIG_WL_SEM
+    
+    int r1 = k_sem_take(&my_sem, K_NO_WAIT);
+    printk("sem_take#1: ret=%d\n", r1);
+
+    int r2 = k_sem_take(&my_sem, K_NO_WAIT);
+    printk("sem_take#2: ret=%d\n", r2);
+
+    int r3 = k_sem_take(&my_sem, K_NO_WAIT);
+    printk("sem_take#3: ret=%d\n", r3);
+
+    k_sem_give(&my_sem);
+
+    fi_sem_report();
+    #endif
+
+    
+    
+    printk("[RUN] END\n");
     return 0;
 }

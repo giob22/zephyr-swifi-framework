@@ -1,11 +1,17 @@
+common:
+  platform_allow:
+    - mps2/an385
+  timeout: 120
+  harness: console
+  
+  
+
 tests:
-  swifi.msgq.msgsize.baseline:
-    platform_allow:
-      - mps2/an385
+  swifi.msgq.baseline:
+    tags: msgq    
     extra_configs:
       - CONFIG_FI_ENABLE=n
-    timeout: 30
-    harness: console
+      - CONFIG_WL_MSGQ=y
     harness_config:
       type: multi_line
       ordered: true
@@ -14,43 +20,493 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
-          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
-          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
  
-  swifi.msgq.msgsize.badarg4:
-    platform_allow:
-      - mps2/an385
+  swifi.msgq.msgsize.badarg4.assert_off:
+    tags: msgq
     extra_configs:
       - CONFIG_ASSERT=n
       - CONFIG_FI_VALUE=0x40
       - CONFIG_FI_ENABLE=y
-    timeout: 30
-    harness: console
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
     harness_config:
       type: multi_line
       ordered: true
       regex:
+        - '\[FI\] inject target=msg_size'
         - 'CORROTTA'  
         - '\[RUN\] END' 
       record:
         regex:
-          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
-          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
 
 
-  swifi.msgq.msgsize.badarg1:
-    platform_allow:
-      - mps2/an385
+  swifi.msgq.msgsize.badarg1.assert_off:
+    tags: msgq
     extra_configs:
       - CONFIG_ASSERT=n
       - CONFIG_FI_VALUE=0x0
       - CONFIG_FI_ENABLE=y
-    timeout: 30
-    harness: console
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.msgq.msgsize.badarg2.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x80000000
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+  swifi.msgq.msgsize.badarg3.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0xFFFFFFFF
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+
+
+
+
+
+
+
+  swifi.msgq.msgsize.badarg4.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - 'ASSERTION FAIL'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+
+  swifi.msgq.msgsize.badarg1.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x0
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.msgq.msgsize.badarg2.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x80000000
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - 'ASSERTION FAIL'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+  swifi.msgq.msgsize.badarg3.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0xFFFFFFFF
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - 'ASSERTION FAIL'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+## --------------write_ptr----------------------
+
+  swifi.msgq.writeptr.badarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=5
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=write_ptr'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+  swifi.msgq.writeptr.badarg4.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=5
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=write_ptr'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+
+## --------------maxmsgs----------------------
+
+  swifi.msgq.maxmsgs.badarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=4
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=max_msgs'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+## --------------bufstart----------------------
+
+  swifi.msgq.bufstart.badarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=6
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_start'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  
+  swifi.msgq.bufstart.badarg4rel.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=6
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=32
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_start'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+  
+  swifi.msgq.bufstart.badarg4rel.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=6
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=32
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_start'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+## --------------bufend----------------------
+
+  swifi.msgq.bufend.badarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=7
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_end'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.msgq.bufend.badarg4rel.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=7
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=-12
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_end'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.msgq.bufend.badarg4rel.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=7
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=-12
+      - CONFIG_WL_MSGQ=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=buffer_end'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+## --------------readptr----------------------
+
+  swifi.msgq.readptr.badarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=9
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=read_ptr'
+      record:
+        regex:
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+
+#----------------------------------------------------------------------
+#         SEMAFORI
+# ---------------------------------------------------------------------
+
+# ---------------------count---------------------
+
+  swifi.sem.baseline:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_ENABLE=n
     harness_config:
       type: multi_line
       ordered: true
@@ -58,7 +514,141 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
-          - 'CANARY after ...#=(?P<n_canary>\d+). (?P<canary_status>\w+)'
-          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
-          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
-          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9]+(?P<used>\d+)[^0-9]+(?P<write_off>\d+)[^0-9]+(?P<read_off>\d+)'
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.sem.count.badarg3.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0xFFFFFFFF
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.sem.count.badarg3.assert_on:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_VALUE=0xFFFFFFFF
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.sem.count.badarg1.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+  swifi.sem.count.badarg2.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x80000000
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+    
+  swifi.sem.count.badarg4rel.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=1
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=1
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+# ---------------------limit---------------------
+
+  swifi.sem.limit.badarg3.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0xFFFFFFFF
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=12
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=0
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=limit'
+      record:
+        regex:
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'

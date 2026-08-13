@@ -1,15 +1,37 @@
-mainmenu "SWIFI k_msgq"
+mainmenu "SWIFI"
 
 
 config FI_ENABLE
     bool "Abilita l'iniezione del fault"
     default y
 config FI_VALUE
-    hex "Valore corrotto scritto in msg_size"
+    hex "Valore corrotto assoluto"
     default 0x40
 config FI_TRIGGER
     int "Attivazione su cui iniettare (fault transitorio)"
     default 1
+config FI_TARGET
+    int "Bersaglio dell'iniezione (numero T della campagna)"
+    default 1
+config FI_VERBOSE
+    bool "Stampa una riga per ogni attivazione non iniettata"
+    default y
+config FI_MODE
+    int "Modo di calcolo del valore corrotto (0=assoluto 1=relativo 2=random)"
+    default 0
+config FI_OFFSET
+    int "Scostamento dal valore originale"
+    default 0
+
+choice
+    prompt "Workload da eseguire"
+    default WL_MSGQ
+config WL_MSGQ
+    bool "Code di messaggi"
+config WL_SEM
+    bool "Semafori"
+endchoice
+    
 
 
 
