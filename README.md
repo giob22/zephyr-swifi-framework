@@ -1,4 +1,4 @@
-# SWIFI su Zephyr — esperimento
+# SWIFI framework su Zephyr — esperimento
 
 Iniezione di guasti software negli oggetti del kernel Zephyr (code di messaggi
 e semafori) mediante interposizione a tempo di collegamento
