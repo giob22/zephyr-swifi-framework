@@ -110,10 +110,6 @@ int __wrap_z_impl_k_msgq_put(struct k_msgq *msgq, const void *data, k_timeout_t 
     }
     
     uintptr_t original = fi_core_applica(msgq, t);
-    uintptr_t corrupted = fi_core_valore(t, original);
-
-    // report pre
-    fi_core_report_pre(t, original, corrupted);
     
     int ret = __real_z_impl_k_msgq_put(msgq, data, timeout);
 

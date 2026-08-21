@@ -652,3 +652,27 @@ tests:
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+
+
+  swifi.sem.count.random.verifica:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_MODE=2
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_TEST_RANDOM_GENERATOR=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=count mode=2'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - 'sem_count after take#3: (?P<count_finale>\d+)'

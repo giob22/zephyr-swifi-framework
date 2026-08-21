@@ -72,11 +72,6 @@ int __wrap_z_impl_k_sem_take(struct k_sem *sem, k_timeout_t timeout){
     }
 
     uintptr_t original = fi_core_applica(sem, t);
-    uintptr_t corrupted = fi_core_valore(t, original);
-
-
-    // ciò che identifica l'iniezione va messo prima della chiamata, perché la chiamata potrebbe non tornare
-    fi_core_report_pre(t, original, corrupted);
 
     int ret = __real_z_impl_k_sem_take(sem, timeout);
 

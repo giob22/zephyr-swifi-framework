@@ -52,9 +52,9 @@ fi_mode_t fi_core_mode(void){
     return (fi_mode_t)CONFIG_FI_MODE;
 }
 
-uintptr_t fi_core_valore(const fi_target_t *t, uintptr_t originale){
+static uintptr_t fi_core_valore(const fi_target_t *t, uintptr_t originale){
 
-    // (uintptr_t) mi permette castare correttamente il valore con il segno 
+    // (intptr_t) mi permette castare correttamente il valore con il segno 
     // (uintptr_t) poi ottengo il valore come uintptr_t → ottengo il complemento a 2
 
     switch ( fi_core_mode() ) {
@@ -68,21 +68,9 @@ uintptr_t fi_core_valore(const fi_target_t *t, uintptr_t originale){
     }
 }
 
-uintptr_t fi_core_applica(void *oggetto, const fi_target_t *t){
-    uintptr_t original = leggi(oggetto, t);
-
-    uintptr_t valore = fi_core_valore(t, original);
-
-    scrivi(oggetto, t, valore);
-
-    return original;
-}
-
-
-
 // report pre e post iniezione
 // 
-void fi_core_report_pre(const fi_target_t *t, uintptr_t originale, uintptr_t corrotto){
+static void fi_core_report_pre(const fi_target_t *t, uintptr_t originale, uintptr_t corrotto){
     printk("[FI] inject target=%s mode=%u orig=0x%08lx new=0x%08lx\n", t->nome, (unsigned)fi_core_mode(), (unsigned long)originale, (unsigned long)corrotto);
 }
 void fi_core_report_post(int ret){
@@ -91,9 +79,30 @@ void fi_core_report_post(int ret){
 // -------------
 // 
 
+uintptr_t fi_core_applica(void *oggetto, const fi_target_t *t){
+    uintptr_t original = leggi(oggetto, t);
+
+    uintptr_t corrupted = fi_core_valore(t, original);
+
+    scrivi(oggetto, t, corrupted);
+
+    // report prima di ritornare, quindi prima della chiamata alla funzione reale
+    // necessario per risolvere il problema con il MODE=2, perché la funzione fi_core_valore non è idempotente
+    fi_core_report_pre(t, original, corrupted);
+
+    return original;
+}
+
+
+
+
 const fi_target_t *fi_core_bersaglio(const fi_target_t *tabella, size_t n, unsigned int id){
     for ( size_t i = 0; i < n; i++ ){
         if ( tabella[i].id == id ){
+            if ( tabella[i].ampiezza > sizeof(uintptr_t) || tabella[i].ampiezza == 0 ){
+                printk("[FI] bersaglio %d: ampiezza %u non valida\n", id, (unsigned)tabella[i].ampiezza);
+                return NULL;
+            }
             return &tabella[i];
         }
     }

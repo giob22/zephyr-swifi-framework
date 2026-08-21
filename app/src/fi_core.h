@@ -10,7 +10,7 @@ typedef enum {FI_SCALARE, FI_PUNTATORE} fi_classe_t;
 
 // per capire se necessario ripristinare il campo dopo la chiamata alla funzione reale.
 // La regola da seguire: si ripristina SOLO se la funzione reale non modifica il campo di suo. Il ripristino rende transitorio il fault;
-// su un campo che la funzione aggiorna (write_ptr) cancellerebbe anche l'errore
+// su un campo che la funzione aggiorna cancellerebbe anche l'errore
 typedef enum {FI_RIPRISTINA, FI_NON_RIPRISTINARE} fi_ripristino_t;
 
 // descrittore di un bersaglio, ovvero un CAMPO di una struct del kernel.
@@ -39,8 +39,6 @@ typedef struct {
 // necessaria per eseguire l'iniezione in una sola attivazione
 bool fi_core_attiva(unsigned int n_attivazione);
 
-// restituisce il valore da sostituire
-uintptr_t fi_core_valore(const fi_target_t *t, uintptr_t originale);
 // sostituisce il valore con quello corrotto
 uintptr_t fi_core_applica(void *oggetto, const fi_target_t *t);
 // ripristina il valore seguendo la regola spiegata sopra ↑
@@ -48,7 +46,6 @@ void fi_core_ripristina(void *oggetto, const fi_target_t *t, uintptr_t originale
 
 
 // report pre e post iniezione
-void fi_core_report_pre(const fi_target_t *t, uintptr_t originale, uintptr_t corrotto);
 void fi_core_report_post(int ret);
 // --------
 
