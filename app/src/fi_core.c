@@ -11,11 +11,11 @@
 // il kernel reagisce.
 // 
 // Introduco quindi un contatore, che a differenza di un booleano mi permette anche di decidere a quale attivazione dell'iniettore colpire
-// quando la coda corrisponde al target. Potrei quindi iniettare il fault alla prima, seconda, ... put; questo permette di considerare diversi
-// stati in cui si trova la coda (piena, vuota, piena a metà).
+// quando l'oggetto corrisponde al target. Potrei quindi iniettare il fault alla prima, seconda, ... attivazione; questo permette di considerare diversi
+// stati in cui si trova l'oggetto possa trovarsi.
 // 
 
-// CONFIG_FI_TRIGGER inietta alla N-esima attivazione sulla coda target
+// CONFIG_FI_TRIGGER inietta alla N-esima attivazione sull'oggetto target
 // CONFIG_FI_ENABLE abilita l'iniezione del fault
 // CONFIG_FI_VALUE valore corrotto applicato al bersaglio
 
@@ -29,6 +29,8 @@ bool fi_core_attiva(unsigned int n_attivazione){
     if ( !ret )
         printk("[FI] attivazione #%u: nessuna iniezione\n", n_attivazione);
     #endif
+    if ( ret )
+        printk("[FI] contesto di esecuzione: %s\n", (k_is_in_isr()) ? "interrupt" : "thread");
     return ret;
 }
 
@@ -93,23 +95,34 @@ uintptr_t fi_core_applica(void *oggetto, const fi_target_t *t){
     return original;
 }
 
+void* fi_core_base(void *oggetto, void *const *parametri, size_t n, const fi_target_t *t){
+    
+    if ( t->luogo != FI_PARAMETRO ) return oggetto;
+    
+    if ( t->indice >= n ){
+        printk("[FI] bersaglio %s: nessuna iniezione, parametro %u inesistente\n", t->nome, t->indice);
+        return NULL;
+    }
+    return parametri[t->indice];
+}
 
 
 
-const fi_target_t *fi_core_bersaglio(const fi_target_t *tabella, size_t n, unsigned int id){
+
+const fi_target_t *fi_core_bersaglio(const fi_target_t *tabella, size_t n){
     for ( size_t i = 0; i < n; i++ ){
-        if ( tabella[i].id == id ){
+        if ( tabella[i].id == CONFIG_FI_TARGET ){
             if ( tabella[i].ampiezza > sizeof(uintptr_t) || tabella[i].ampiezza == 0 ){
-                printk("[FI] bersaglio %d: ampiezza %u non valida\n", id, (unsigned)tabella[i].ampiezza);
+                printk("[FI] bersaglio %d: ampiezza %u non valida\n", CONFIG_FI_TARGET, (unsigned)tabella[i].ampiezza);
                 return NULL;
             }
             return &tabella[i];
         }
     }
-    printk("[FI] bersaglio %d non disponibile: nessuna iniezione\n", id);
+    printk("[FI] bersaglio %d non disponibile: nessuna iniezione\n", CONFIG_FI_TARGET);
     return NULL;
 }
 
-void fi_core_report_riepilogo(unsigned int su_bersaglio, unsigned int su_altri){
-    printk("[FI] riepilogo: bersaglio=%u altri=%u\n", su_bersaglio, su_altri);
+void fi_core_report_riepilogo(const char* nome_primitiva, unsigned int su_bersaglio, unsigned int su_altri){
+    printk("[FI] riepilogo su %s: bersaglio=%u altri=%u\n", nome_primitiva, su_bersaglio, su_altri);
 }

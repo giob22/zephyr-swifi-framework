@@ -6,13 +6,12 @@
 #define MAX_MSGS 4
 #define CANARY_BYTES 64
 #define CANARY_PATTERN 0xAA
-
-void fi_msgq_report(void);
-void fi_sem_report(void);
+#define LIMIT 1
+#define INITIAL_COUNT 1
 
 
 // test per verificare l'utilizzo appropriato di k_magq_put nel contesto di interrupt
-#ifdef TIMER_ON
+#ifdef CONFIG_WL_MSGQ_ISR
 
 
 struct k_timer my_timer;
@@ -77,9 +76,6 @@ static void msgq_dump(const char *quando){
     // write_off è il dato chiave: deve essere compreso tra 0 e 15.
     // Il ring buffer è 16 byte = MAX_MSGS (4 messaggi) x sizeof(data_type) (4 byte ciascuno).
     // 
-    // ATTENZIONE: used_msgs, write_ptr e buffer_start NON fanno parte dell'API pubblica
-    // di k_msgq: sono stato interno della struct. Leggerli è indispensabile per osservare
-    // la corruzione, ma lega la strumentazione a questa versione di Zephyr.
     printk("[CODA %s]\tused=%u,\t|\twrite_off=%d\t|\tread_off=%d\n",
         quando,
         my_msgq.used_msgs,
@@ -116,10 +112,21 @@ static void canary_check(const char *quando){
 // SEMAFORI
 
 
+#ifdef CONFIG_WL_SEM
 
-K_SEM_DEFINE(my_sem, 1, 1); // conteggio 1, limite 1 → mutex
+K_SEM_DEFINE(my_sem, INITIAL_COUNT, LIMIT); // conteggio 1, limite 1 → mutex
 
+static void sem_dump(const char *quando){
 
+    printk("[SEM %s]\tcount=%u,\t|\tlimit=%u\n",
+        quando,
+        (unsigned)my_sem.count,
+        (unsigned)my_sem.limit
+    );
+
+}
+
+#endif
 
 
 int main(void){
@@ -131,16 +138,16 @@ int main(void){
     canary_fill();
 
 
-    data_type tx = { .value = 42 };
     data_type rx = { 0 };
-
+    
     int ret;
-
+    
     printk("\n\n--- SWIFI k_msgq: avvio ---\n");
-
+    
     msgq_dump("iniziale");
-
-    #ifndef TIMER_ON 
+    
+    #ifndef CONFIG_WL_MSGQ_ISR 
+    data_type tx = { .value = 42 };
 
     printk("\nPRODUTTORE\n");
 
@@ -191,7 +198,7 @@ int main(void){
 
     #endif
 
-    #ifdef TIMER_ON
+    #ifdef CONFIG_WL_MSGQ_ISR
 
 
     // check se sono in contesto interrupted
@@ -217,18 +224,10 @@ int main(void){
     msgq_dump("after get#1");
     
 
-    // Terminato il timer vado a richiedere il report per verificare se l'ISR associata abbia effettivamente utilizzato k_msgq_put
     
     
     #endif
 
-    // ----------------------------------------------
-    // REPORT
-
-    fi_msgq_report();
-
-    // ----------------------------------------------
-    // 
 
 
     // marcatore di fine run, aggiunto per discriminare i diversi failure mode
@@ -245,16 +244,21 @@ int main(void){
     
     int r1 = k_sem_take(&my_sem, K_NO_WAIT);
     printk("sem_take#1: ret=%d\n", r1);
+    sem_dump("after take#1");
 
     int r2 = k_sem_take(&my_sem, K_NO_WAIT);
     printk("sem_take#2: ret=%d\n", r2);
+    sem_dump("after take#2");
 
     int r3 = k_sem_take(&my_sem, K_NO_WAIT);
     printk("sem_take#3: ret=%d\n", r3);
 
-    k_sem_give(&my_sem);
+    sem_dump("after take#3");
 
-    fi_sem_report();
+    
+    k_sem_give(&my_sem);
+    sem_dump("after give#1");
+
     #endif
 
     

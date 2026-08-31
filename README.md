@@ -2,7 +2,7 @@
 
 Iniezione di guasti software negli oggetti del kernel Zephyr (code di messaggi
 e semafori) mediante interposizione a tempo di collegamento
-(`-Wl,--wrap=z_impl_k_msgq_put`, `-Wl,--wrap=z_impl_k_sem_take`).
+(`-Wl,--wrap=z_impl_k_msgq_put`, `-Wl,--wrap=z_impl_k_sem_take`, `-Wl,--wrap=main`).
 
 ## Ambiente
 
@@ -37,7 +37,7 @@ west build -p always -b mps2/an385 <percorso>/app -- \
 | `CONFIG_FI_VALUE` | valore corrotto, usato con `CONFIG_FI_MODE=0` |
 | `CONFIG_FI_OFFSET` | scostamento dal valore originale, usato con `CONFIG_FI_MODE=1` |
 | `CONFIG_FI_VERBOSE` | stampa una riga per ogni attivazione non iniettata |
-| `CONFIG_WL_MSGQ` / `CONFIG_WL_SEM` | carico da eseguire: code di messaggi oppure semafori (mutuamente esclusivi) |
+| `CONFIG_WL_MSGQ` / `CONFIG_WL_MSGQ_ISR` / `CONFIG_WL_SEM` | carico da eseguire: code di messaggi (contesto di interruzione o thread) oppure semafori (mutuamente esclusivi) |
 | `CONFIG_ASSERT` | asserzioni del kernel |
 
 ## Faultload
@@ -46,24 +46,37 @@ Bersagli e valori di guasto, nella classificazione di Albinet. Gli identificator
 sono disgiunti fra un oggetto e l'altro, perché tutti i moduli sono presenti nella
 stessa immagine.
 
-| `FI_TARGET` | campo | oggetto | Bad\_Arg 1 | Bad\_Arg 2 | Bad\_Arg 3 | Bad\_Arg 4 |
-|---|---|---|---|---|---|---|
-| 1 | `msg_size` | `k_msgq` | `0x0` | `0x80000000` | `0xFFFFFFFF` | maggiore della dimensione nominale |
-| 4 | `max_msgs` | `k_msgq` | `0x0` | `0x80000000` | `0xFFFFFFFF` | — |
-| 5 | `write_ptr` | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | scostamento errato dentro il buffer |
-| 6 | `buffer_start` | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | oltre `buffer_end` |
-| 7 | `buffer_end` | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | prima di `buffer_start` |
-| 9 | `read_ptr` | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | area valida ma diversa |
-| 11 | `count` | `k_sem` | `0x0` | `0x80000000` | `0xFFFFFFFF` | `+1` |
-| 12 | `limit` | `k_sem` | `0x0` | `0x80000000` | `0xFFFFFFFF` | minore di `count` |
+| `FI_TARGET` | bersaglio | luogo | oggetto | Bad\_Arg 1 | Bad\_Arg 2 | Bad\_Arg 3 | Bad\_Arg 4 |
+|---|---|---|---|---|---|---|---|
+| 1 | `msg_size` | campo | `k_msgq` | `0x0` | `0x80000000` | `0xFFFFFFFF` | maggiore della dimensione nominale |
+| 2 | `data` | parametro | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | scostamento dentro l'area del messaggio |
+| 3 | `timeout` | parametro | `k_msgq` | `0x0` | `0x80000000` | `0xFFFFFFFF` | attesa finita in contesto di interruzione |
+| 4 | `max_msgs` | campo | `k_msgq` | `0x0` | `0x80000000` | `0xFFFFFFFF` | — |
+| 5 | `write_ptr` | campo | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | scostamento errato dentro il buffer |
+| 6 | `buffer_start` | campo | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | oltre `buffer_end` |
+| 7 | `buffer_end` | campo | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | prima di `buffer_start` |
+| 9 | `read_ptr` | campo | `k_msgq` | `0x0` | casuale | `0xFFFFFFFF` | area valida ma diversa |
+| 11 | `count` | campo | `k_sem` | `0x0` | `0x80000000` | `0xFFFFFFFF` | `+1` |
+| 12 | `limit` | campo | `k_sem` | `0x0` | `0x80000000` | `0xFFFFFFFF` | minore di `count` |
+
+Un bersaglio è un **campo** della struttura dati dell'oggetto del kernel oppure
+un **parametro** della chiamata. Nel primo caso il descrittore dichiara lo
+scostamento dall'indirizzo dell'oggetto, nel secondo la posizione nella firma
+della primitiva. La corruzione di un parametro agisce sulla copia locale, quindi
+sparisce al ritorno dalla chiamata; quella di un campo resta nell'oggetto se il
+descrittore non chiede il ripristino.
 
 I primi tre valori sono assoluti e si impostano con `CONFIG_FI_MODE=0` e
-`CONFIG_FI_VALUE`. Il quarto è **relativo al valore corrente** del campo e si
-imposta con `CONFIG_FI_MODE=1` e `CONFIG_FI_OFFSET`, che accetta anche valori
-negativi. Il valore casuale si ottiene con `CONFIG_FI_MODE=2`.
+`CONFIG_FI_VALUE`. Il quarto è scelto in funzione del bersaglio: dove conta la
+distanza dal valore corretto si esprime **relativamente** al valore corrente, con
+`CONFIG_FI_MODE=1` e `CONFIG_FI_OFFSET`, che accetta anche valori negativi;
+altrove è assoluto come i primi tre. Il valore casuale si ottiene con
+`CONFIG_FI_MODE=2`.
 
 Il bersaglio dev'essere coerente con il carico selezionato: con
-`CONFIG_WL_SEM` attivo, un bersaglio delle code non viene mai raggiunto.
+`CONFIG_WL_SEM` attivo, un bersaglio delle code non viene mai raggiunto, e
+`timeout` è interessante soltanto con `CONFIG_WL_MSGQ_ISR`, dove attendere non è
+ammesso.
 
 ## Campagna completa
 
@@ -80,13 +93,6 @@ Un singolo scenario — i nomi sono le chiavi sotto `tests:` in `app/testcase.ya
     -s <nome-scenario>
 ```
 
-Gli scenari relativi a un solo oggetto del kernel si selezionano con `--tag`. I
-tag disponibili sono `msgq` e `sem`:
-
-```bash
-./scripts/twister -p mps2/an385 -T <percorso>/app \
-    --tag sem
-```
 
 ## Risultati
 

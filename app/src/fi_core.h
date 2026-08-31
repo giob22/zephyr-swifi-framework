@@ -13,8 +13,8 @@ typedef enum {FI_SCALARE, FI_PUNTATORE} fi_classe_t;
 // su un campo che la funzione aggiorna cancellerebbe anche l'errore
 typedef enum {FI_RIPRISTINA, FI_NON_RIPRISTINARE} fi_ripristino_t;
 
-// descrittore di un bersaglio, ovvero un CAMPO di una struct del kernel.
-// specifica: dove si trova, quanto è grande e come si tratta. 
+// specifica dove si trova il bersaglio: un campo di una struct dell'oggetto, oppure un parametro della chiamata
+typedef enum {FI_CAMPO = 0, FI_PARAMETRO = 1} fi_luogo_t;
 
 // specifica come calcolare il valore corrotto a partire dall'originale
 typedef enum {
@@ -23,15 +23,20 @@ typedef enum {
     FI_MODE_RANDOM = 2,     // valore estratto
 } fi_mode_t;
 
+
+// descrittore di un bersaglio, ovvero un CAMPO di una struct del kernel.
+// specifica: dove si trova, quanto è grande e come si tratta. 
 typedef struct {
     unsigned int id;
     const char *nome;
     size_t offset;
     size_t ampiezza;
-    fi_classe_t classe;
-    // Presente ma non ancora letta da nessuna funzione: con la rappresentazione a uintptr_t
+    // La classe è presente ma non ancora letta da nessuna funzione: con la rappresentazione a uintptr_t
     // l'aritmetica su scalari e su puntatori coincide, quindi fi_core_valore non ha bisogno di distinguerli. 
     // Resta come documentazione del bersaglio
+    fi_classe_t classe;
+    fi_luogo_t luogo;
+    unsigned int indice; // utile solo se luogo == FI_PARAMETRO, indica la posizione nella firma
     fi_ripristino_t ripristino;
 } fi_target_t;
 
@@ -42,6 +47,12 @@ bool fi_core_attiva(unsigned int n_attivazione);
 // sostituisce il valore con quello corrotto
 uintptr_t fi_core_applica(void *oggetto, const fi_target_t *t);
 // ripristina il valore seguendo la regola spiegata sopra ↑
+
+// permette di scegliere l'indirizzo base dell'iniezione: ha come risultato l'indirizzo del parametro, oppure l'indirizzo 
+// della struct dell'oggetto
+// ritorna NULL nel caso in cui è FI_PARAMETRO, ma l'indice non corrisponde a nessun parametro reale.
+void* fi_core_base(void *oggetto, void *const *parametri, size_t n, const fi_target_t *t);
+
 void fi_core_ripristina(void *oggetto, const fi_target_t *t, uintptr_t originale);
 
 
@@ -50,9 +61,9 @@ void fi_core_report_post(int ret);
 // --------
 
 // cerca il bersaglio per id. NULL se non c'e'.
-const fi_target_t *fi_core_bersaglio(const fi_target_t *tabella, size_t n, unsigned int id);
+const fi_target_t *fi_core_bersaglio(const fi_target_t *tabella, size_t n);
 
-void fi_core_report_riepilogo(unsigned int su_bersaglio, unsigned int su_altri);
+void fi_core_report_riepilogo(const char* nome_primitiva, unsigned int su_bersaglio, unsigned int su_altri);
 
 
 

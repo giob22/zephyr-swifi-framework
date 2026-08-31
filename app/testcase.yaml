@@ -1,7 +1,7 @@
 common:
   platform_allow:
     - mps2/an385
-  timeout: 120
+  timeout: 60
   harness: console
   
   
@@ -20,12 +20,14 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
  
   swifi.msgq.msgsize.badarg4.assert_off:
     tags: msgq
@@ -46,12 +48,14 @@ tests:
         - '\[RUN\] END' 
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 
   swifi.msgq.msgsize.badarg1.assert_off:
@@ -72,12 +76,14 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
   swifi.msgq.msgsize.badarg2.assert_off:
     tags: msgq
@@ -97,12 +103,14 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
   swifi.msgq.msgsize.badarg3.assert_off:
     tags: msgq
     extra_configs:
@@ -121,12 +129,43 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+  
+  swifi.msgq.msgsize.isrbadarg4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=0x40
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=1
+      - CONFIG_FI_MODE=0 
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_WL_MSGQ_ISR=y 
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=msg_size'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'  
 
 
 
@@ -153,12 +192,14 @@ tests:
         - 'ASSERTION FAIL'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 
   swifi.msgq.msgsize.badarg1.assert_on:
@@ -179,12 +220,14 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
   swifi.msgq.msgsize.badarg2.assert_on:
     tags: msgq
@@ -204,12 +247,14 @@ tests:
         - 'ASSERTION FAIL'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
   swifi.msgq.msgsize.badarg3.assert_on:
     tags: msgq
     extra_configs:
@@ -228,12 +273,14 @@ tests:
         - 'ASSERTION FAIL'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 ## --------------write_ptr----------------------
 
@@ -254,12 +301,14 @@ tests:
         - '\[FI\] inject target=write_ptr'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
   swifi.msgq.writeptr.badarg4.assert_on:
     tags: msgq
     extra_configs:
@@ -277,12 +326,14 @@ tests:
         - '\[FI\] inject target=write_ptr'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 
 ## --------------maxmsgs----------------------
@@ -304,12 +355,14 @@ tests:
         - '\[FI\] inject target=max_msgs'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 ## --------------bufstart----------------------
 
@@ -330,12 +383,14 @@ tests:
         - '\[FI\] inject target=buffer_start'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
   
   swifi.msgq.bufstart.badarg4rel.assert_off:
@@ -357,12 +412,14 @@ tests:
         - '\[FI\] inject target=buffer_start'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
   
   swifi.msgq.bufstart.badarg4rel.assert_on:
     tags: msgq
@@ -383,12 +440,14 @@ tests:
         - '\[FI\] inject target=buffer_start'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 ## --------------bufend----------------------
 
@@ -409,12 +468,14 @@ tests:
         - '\[FI\] inject target=buffer_end'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
   swifi.msgq.bufend.badarg4rel.assert_off:
     tags: msgq
@@ -435,12 +496,14 @@ tests:
         - '\[FI\] inject target=buffer_end'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
   swifi.msgq.bufend.badarg4rel.assert_on:
     tags: msgq
@@ -461,12 +524,14 @@ tests:
         - '\[FI\] inject target=buffer_end'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
 
 ## --------------readptr----------------------
 
@@ -488,13 +553,127 @@ tests:
         - '\[FI\] inject target=read_ptr'
       record:
         regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
           - 'CANARY after put#(?P<n_put>\d+). CORROTTA: (?P<byte_corrotti>\d+) byte su (?P<byte_totali>\d+)[^0-9]+(?P<primo>\d+) a (?P<ultimo>\d+)'
           - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
           - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+## timeout
 
+  swifi.msgq.data.rel4.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=2
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=4
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=data'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+
+  swifi.msgq.data.rel4.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=2
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=4
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=data'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+
+  swifi.msgq.timeout.isrwait1.assert_on:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=y
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=3
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_FI_MODE=0
+      - CONFIG_FI_VALUE=1
+      - CONFIG_WL_MSGQ_ISR=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=timeout'
+        - 'ASSERTION FAIL'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+
+  swifi.msgq.timeout.isrwait1.assert_off:
+    tags: msgq
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=1
+      - CONFIG_FI_TARGET=3
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_MSGQ=y
+      - CONFIG_FI_MODE=0
+      - CONFIG_FI_VALUE=1
+      - CONFIG_WL_MSGQ_ISR=y
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] inject target=timeout'
+        - '\[RUN\] END'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_msgq_put: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'CANARY after (?P<op_canary>\w+)#(?P<n_canary>\d+). (?P<canary_status>\w+)'
+          - 'get#(?P<n_get>\d+): ret=(?P<ret_get>-?\d+)[^=]+=(?P<valore>\d+)'
+          - '.CODA after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<used>\d+)[^0-9-]+(?P<write_off>-?\d+)[^0-9-]+(?P<read_off>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+  
+    
 
 #----------------------------------------------------------------------
 #         SEMAFORI
@@ -514,9 +693,11 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
   swifi.sem.count.badarg3.assert_off:
     tags: sem
@@ -536,9 +717,12 @@ tests:
         - '\[FI\] inject target=count'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
   swifi.sem.count.badarg3.assert_on:
     tags: sem
@@ -558,9 +742,12 @@ tests:
         - '\[FI\] inject target=count'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
   swifi.sem.count.badarg1.assert_off:
     tags: sem
@@ -580,9 +767,12 @@ tests:
         - '\[FI\] inject target=count'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
   swifi.sem.count.badarg2.assert_off:
     tags: sem
@@ -602,9 +792,12 @@ tests:
         - '\[FI\] inject target=count'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
     
   swifi.sem.count.badarg4rel.assert_off:
     tags: sem
@@ -625,9 +818,39 @@ tests:
         - '\[FI\] inject target=count'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
+  
+  swifi.sem.count.trigger2.assert_off:
+    tags: sem
+    extra_configs:
+      - CONFIG_ASSERT=n
+      - CONFIG_FI_VALUE=1
+      - CONFIG_FI_ENABLE=y
+      - CONFIG_FI_TRIGGER=2
+      - CONFIG_FI_TARGET=11
+      - CONFIG_FI_VERBOSE=y
+      - CONFIG_WL_SEM=y
+      - CONFIG_FI_MODE=1
+      - CONFIG_FI_OFFSET=1
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - '\[FI\] attivazione #1: nessuna iniezione'
+        - '\[FI\] inject target=count'
+      record:
+        regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
+          - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
+          - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
+          - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
 # ---------------------limit---------------------
 
@@ -649,9 +872,12 @@ tests:
         - '\[FI\] inject target=limit'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - '\[FI\] done ret=(?P<ret_op>-?\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'
 
 
   swifi.sem.count.random.verifica:
@@ -673,6 +899,9 @@ tests:
         - '\[RUN\] END'
       record:
         regex:
+          - '\[FI\] riepilogo su k_sem_take: bersaglio=(?P<su_bersaglio>\d+) altri=(?P<su_altri>\d+)'
           - '\[FI\] inject target=(?P<target>\w+) mode=(?P<mode>\d+) orig=(?P<orig>0x[0-9a-fA-F]+) new=(?P<new>0x[0-9a-fA-F]+)'
           - 'sem_take#(?P<n_take>\d+): ret=(?P<ret_take>-?\d+)'
           - 'sem_count after take#3: (?P<count_finale>\d+)'
+          - '\[FI\] contesto [^:]+: (?P<contesto>\w+)'
+          - '.SEM after (?P<op>\w+)#(?P<n_op>\d+)[^0-9-]+(?P<count>\d+)[^0-9-]+(?P<limit>\d+)'

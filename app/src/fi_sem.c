@@ -38,7 +38,7 @@ static unsigned int fi_calls;
 static unsigned int fi_calls_other;
 
 void fi_sem_report(void){
-    fi_core_report_riepilogo(fi_calls, fi_calls_other);
+    fi_core_report_riepilogo("k_sem_take", fi_calls, fi_calls_other);
 }
 
 int __wrap_z_impl_k_sem_take(struct k_sem *sem, k_timeout_t timeout){
@@ -65,17 +65,28 @@ int __wrap_z_impl_k_sem_take(struct k_sem *sem, k_timeout_t timeout){
         return __real_z_impl_k_sem_take(sem, timeout); 
     }
 
-    const fi_target_t *t = fi_core_bersaglio(sem_targets, ARRAY_SIZE(sem_targets), CONFIG_FI_TARGET);
+    const fi_target_t *t = fi_core_bersaglio(sem_targets, ARRAY_SIZE(sem_targets));
 
     if ( t == NULL ){
         return __real_z_impl_k_sem_take(sem, timeout);
     }
 
-    uintptr_t original = fi_core_applica(sem, t);
+    void *param_addr[] = { (void*)&sem, (void*)&timeout };
 
+    void* base = fi_core_base(sem, param_addr, ARRAY_SIZE(param_addr), t);
+
+    if ( base == NULL ){
+        return  __real_z_impl_k_sem_take(sem, timeout);
+    }
+
+    uintptr_t original = fi_core_applica(base, t);
+
+    // chiamata all'implementazione reale
     int ret = __real_z_impl_k_sem_take(sem, timeout);
 
-    fi_core_ripristina(sem, t, original);
+    // report post
+
+    fi_core_ripristina(base, t, original);
 
     fi_core_report_post(ret);
 
