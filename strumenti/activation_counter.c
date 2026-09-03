@@ -25,15 +25,6 @@ static unsigned int calls_lock_others;
 static unsigned int calls_take;
 static unsigned int calls_take_others;
 
-static unsigned int calls_give;
-static unsigned int calls_give_others;
-
-static unsigned int calls_start;
-static unsigned int calls_start_others;
-
-static unsigned int calls_sleep;
-static unsigned int calls_sleep_others;
-
 static unsigned int calls_msgq_put;
 static unsigned int calls_msgq_put_others;
 
