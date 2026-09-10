@@ -83,7 +83,7 @@ git checkout df1fb529e38f34fa45c1fe1cb6aace42802de3db
 | 6 | Controllore          | Twister: costruisce un'immagine per scenario, le esegue e impone il timeout                                              |
 | 7 | Monitor              | `hook.c`                                                                                                                 |
 | 8 | Raccoglitore di dati | La strumentazione nel carico: sentinella di memoria e stampe dello stato dell'oggetto.<br>Queste non fanno parte del framework                 |
-| 9 | Analizzatore di dati | Twister estrae i campi in tabella con le espressioni regolari `record`                                              |
+| 9 | Analizzatore di dati | Twister estrae i campi in tabella con le espressioni regolari `record`; <br>la classificazione degli esiti resta manuale                                          |
 
 ## Build ed esecuzione di una singola configurazione
 
