@@ -75,15 +75,15 @@ git checkout df1fb529e38f34fa45c1fe1cb6aace42802de3db
 
 | # | Componente           |                                                                                                                          |
 |---|----------------------|--------------------------------------------------------------------------------------------------------------------------|
-| 1 | Sistema bersaglio    | Zephyr (v4.4.0-8541-gdf1fb529e38f, commit df1fb529e38f34fa45c1fe1cb6aace42802de3db)<br>su mps2/an385 emulata su QEMU   |
-| 2 | Iniettore            | Il nucleo fi_core.c e i moduli d'oggetto fi_###.c                                                                    |
-| 3 | Libreria dei guasti  | Composta da due parti: descrittore nei moduli e la tabella di configurazioni in testcase.yaml                          |
+| 1 | Sistema bersaglio    | Zephyr (`v4.4.0-8541-gdf1fb529e38f`, commit `df1fb529e38f34fa45c1fe1cb6aace42802de3db`)<br>su `mps2/an385` emulata su QEMU   |
+| 2 | Iniettore            | Il nucleo `fi_core.c` e i moduli d'oggetto `fi_###.c`                                                                    |
+| 3 | Libreria dei guasti  | Composta da due parti: descrittore nei moduli e la tabella di configurazioni in `testcase.yaml`                          |
 | 4 | Generatore di carico | main.c                                                                                                                 |
-| 5 | Libreria carichi     | testcase.yaml e corrispondono a: CONFIG_WL_MSGQ, CONFIG_WL_MSGQ_ISR e CONFIG_WL_SEM. In aggiunta, app_kernel.c |
+| 5 | Libreria carichi     | I tre carichi selezionabili in `main.c` con `CONFIG_WL_MSGQ`, `CONFIG_WL_MSGQ_ISR` e `CONFIG_WL_SEM`,<br>più il benchmark di terze parti in `strumenti/app_kernel` |
 | 6 | Controllore          | Twister: costruisce un'immagine per scenario, le esegue e impone il timeout                                              |
-| 7 | Monitor              | hook.c                                                                                                                 |
-| 8 | Raccoglitore di dati | Twister: cattura la console e applica le espressioni regolari record che estraggono i campi in tabella                 |
-| 9 | Analizzatore di dati | non presente: la classificazione delegata dall'utilizzatore                                                              |
+| 7 | Monitor              | `hook.c`                                                                                                                 |
+| 8 | Raccoglitore di dati | La strumentazione nel carico: sentinella di memoria e stampe dello stato dell'oggetto.<br>Queste non fanno parte del framework                 |
+| 9 | Analizzatore di dati | Twister estrae i campi in tabella con le espressioni regolari `record`                                              |
 
 ## Build ed esecuzione di una singola configurazione
 
